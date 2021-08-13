@@ -1,0 +1,23 @@
+#!/bin/bash
+
+while :
+do
+
+content=$(curl -s "http://172.22.2.6/a?f=j") 
+	
+	youless_watt_s0=($(jq -r  '.ps0' <<< "${content}" ))
+	#youless_watt_optical=($(jq -r  '.pwr' <<< "${content}" ))
+	youless_countertotal=($(jq -r  '.cnt' <<< "${content}" ))
+	youless_counter=($(jq -r  '.cs0' <<< "${content}" ))
+
+youless_countertotal=$(echo $youless_countertotal | sed 's/,/./g')
+youless_watt_optical=$(echo $youless_watt_optical | sed 's/,/./g')
+
+youless_counter=$(echo $youless_counter | sed 's/,/./g')
+youless_watt_s0=$(echo $youless_watt_s0 | sed 's/,/./g')
+
+
+curl -i -XPOST "https://maulberry:8086/write?db=mainDB&u=xxx&p=xxx" --insecure --data-binary "smartmeter watt_s0=$youless_watt_s0,countertotal=$youless_countertotal,counter=$youless_counter,counter=$youless_counter"
+
+	sleep 1
+done
